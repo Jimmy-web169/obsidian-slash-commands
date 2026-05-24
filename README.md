@@ -1,4 +1,4 @@
-# Slash Commands
+# Slash Menu
 
 A Notion-style slash menu for Obsidian. Press `/` at the start of a line (or after a space) and pick a block from the list — headings, lists, callouts, code blocks, math, mermaid diagrams, internal links, video embeds, and rich link preview cards.
 
@@ -49,14 +49,14 @@ If a site blocks the request or has no OpenGraph metadata, the plugin falls back
 ### From Community Plugins (after approval)
 
 1. Settings → Community plugins → Browse
-2. Search for **Slash Commands**
+2. Search for **Slash Menu**
 3. Install → Enable
 
 ### Manual install
 
 1. Download `main.js`, `manifest.json`, `styles.css` from the latest [release](https://github.com/Jimmy-web169/obsidian-slash-commands/releases)
 2. Place them in `<your-vault>/.obsidian/plugins/slash-commands/`
-3. Reload Obsidian → Settings → Community plugins → enable **Slash Commands**
+3. Reload Obsidian → Settings → Community plugins → enable **Slash Menu**
 
 ### BRAT (beta)
 
