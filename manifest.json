@@ -1,0 +1,10 @@
+{
+  "id": "slash-commands",
+  "name": "Slash Commands",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Notion-style / slash menu to quickly insert headings, lists, callouts, code blocks, link cards and more.",
+  "author": "Jimmy-web169",
+  "authorUrl": "https://github.com/Jimmy-web169",
+  "isDesktopOnly": false
+}
