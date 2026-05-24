@@ -1,7 +1,7 @@
 {
   "id": "slash-commands",
   "name": "Slash Inserter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "1.4.0",
   "description": "Notion-style / slash menu to quickly insert headings, lists, callouts, code blocks, link cards and more.",
   "author": "Jimmy-web169",

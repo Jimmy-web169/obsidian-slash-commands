@@ -39,7 +39,10 @@
   text-overflow: ellipsis;
 }
 
-.slash-card {
+a.slash-card,
+.markdown-rendered a.slash-card,
+.markdown-preview-view a.slash-card,
+.cm-content a.slash-card {
   display: flex;
   align-items: stretch;
   gap: 14px;
@@ -47,16 +50,20 @@
   border: 1px solid var(--background-modifier-border);
   border-radius: 8px;
   background: var(--background-secondary);
-  text-decoration: none !important;
-  color: inherit !important;
+  text-decoration: none;
+  color: inherit;
   overflow: hidden;
   max-width: 100%;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.slash-card:hover {
+a.slash-card:hover,
+.markdown-rendered a.slash-card:hover,
+.markdown-preview-view a.slash-card:hover,
+.cm-content a.slash-card:hover {
   background: var(--background-modifier-hover);
   border-color: var(--interactive-accent);
+  text-decoration: none;
 }
 
 .slash-card-body {
