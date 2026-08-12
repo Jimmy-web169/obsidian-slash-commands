@@ -8,6 +8,7 @@ Type `/` then start typing the command name or alias. Press Enter (or click) to 
 
 | Command | Aliases | Result |
 | --- | --- | --- |
+| `/page` | `/subpage` `/newpage` | **New sub-page** — creates a note nested under the current one, links it, and opens it |
 | `/h1` `/h2` `/h3` | `/#` `/##` `/###` | Headings |
 | `/bullet` | `/ul` `/list` | `- item` |
 | `/num` | `/ol` `/number` | `1. item` |

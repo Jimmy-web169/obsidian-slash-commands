@@ -115,13 +115,23 @@ interface SlashCommand {
   action: (editor: Editor, app: App) => void;
 }
 
-class UrlPromptModal extends Modal {
+class TextPromptModal extends Modal {
   private title: string;
-  private onSubmit: (url: string) => void;
+  private placeholder: string;
+  private allowEmpty: boolean;
+  private onSubmit: (value: string) => void;
 
-  constructor(app: App, title: string, onSubmit: (url: string) => void) {
+  constructor(
+    app: App,
+    title: string,
+    placeholder: string,
+    allowEmpty: boolean,
+    onSubmit: (value: string) => void
+  ) {
     super(app);
     this.title = title;
+    this.placeholder = placeholder;
+    this.allowEmpty = allowEmpty;
     this.onSubmit = onSubmit;
   }
 
@@ -130,7 +140,7 @@ class UrlPromptModal extends Modal {
     contentEl.createEl("h3", { text: this.title });
     const input = contentEl.createEl("input", {
       type: "text",
-      attr: { placeholder: "https://..." },
+      attr: { placeholder: this.placeholder },
     });
     input.style.width = "100%";
     input.style.padding = "6px 8px";
@@ -139,10 +149,10 @@ class UrlPromptModal extends Modal {
     input.addEventListener("keydown", (ev) => {
       if (ev.key === "Enter") {
         ev.preventDefault();
-        const url = input.value.trim();
-        if (url) {
+        const value = input.value.trim();
+        if (value || this.allowEmpty) {
           this.close();
-          this.onSubmit(url);
+          this.onSubmit(value);
         }
       } else if (ev.key === "Escape") {
         this.close();
@@ -162,7 +172,7 @@ function promptForUrl(
   formatter: (url: string) => string
 ): void {
   const cur = editor.getCursor();
-  new UrlPromptModal(app, title, (url) => {
+  new TextPromptModal(app, title, "https://...", false, (url) => {
     const text = formatter(url);
     editor.replaceRange(text, cur);
     editor.setCursor({ line: cur.line, ch: cur.ch + text.length });
@@ -207,7 +217,63 @@ function insertBlock(
   }
 }
 
+function sanitizeFileName(name: string): string {
+  return name.replace(/[\\/:#^|[\]?*"<>]/g, "").trim();
+}
+
+async function createSubPage(editor: Editor, app: App, rawName: string): Promise<void> {
+  const current = app.workspace.getActiveFile();
+  if (!current) {
+    new Notice("No active file");
+    return;
+  }
+  const name = sanitizeFileName(rawName) || "Untitled";
+
+  // Folder-note layout: if the current note sits in a folder with the same
+  // name (e.g. "Projects/Projects.md"), nest new pages beside it in that
+  // folder; otherwise create a folder named after the current note.
+  let dir: string;
+  if (current.parent && current.parent.name === current.basename) {
+    dir = current.parent.path;
+  } else {
+    const parentPath =
+      current.parent && current.parent.path !== "/" ? current.parent.path + "/" : "";
+    dir = parentPath + current.basename;
+  }
+
+  try {
+    if (!app.vault.getAbstractFileByPath(dir)) {
+      await app.vault.createFolder(dir);
+    }
+    let path = `${dir}/${name}.md`;
+    for (let i = 2; app.vault.getAbstractFileByPath(path); i++) {
+      path = `${dir}/${name} ${i}.md`;
+    }
+    const newFile = await app.vault.create(path, "");
+
+    const link = app.fileManager.generateMarkdownLink(newFile, current.path);
+    insertAtCursor(editor, link);
+
+    await app.workspace.getLeaf(false).openFile(newFile);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    new Notice(`Failed to create page: ${msg}`);
+  }
+}
+
 const COMMANDS: SlashCommand[] = [
+  {
+    id: "page",
+    name: "Page",
+    description: "Create a sub-page under this note and link it",
+    icon: "file-plus",
+    aliases: ["subpage", "newpage", "child"],
+    action: (e, app) => {
+      new TextPromptModal(app, "New page name", "Untitled", true, (value) => {
+        void createSubPage(e, app, value);
+      }).open();
+    },
+  },
   {
     id: "h1",
     name: "Heading 1",
@@ -357,7 +423,7 @@ const COMMANDS: SlashCommand[] = [
     aliases: ["cardlink", "preview", "richlink", "og"],
     action: (e, app) => {
       const cur = e.getCursor();
-      new UrlPromptModal(app, "Paste URL for card preview", async (url) => {
+      new TextPromptModal(app, "Paste URL for card preview", "https://...", false, async (url) => {
         const line = e.getLine(cur.line);
         const onOwnLine = line.trim() === "" && cur.ch === 0;
         const notice = new Notice("Fetching card preview…", 0);
