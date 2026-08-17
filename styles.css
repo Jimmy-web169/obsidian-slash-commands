@@ -121,3 +121,9 @@ a.slash-card:hover,
   font-family: var(--font-monospace);
   font-size: var(--font-ui-smaller);
 }
+
+.slash-prompt-input {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: var(--font-ui-medium);
+}

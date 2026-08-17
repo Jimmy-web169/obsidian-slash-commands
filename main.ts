@@ -119,14 +119,14 @@ class TextPromptModal extends Modal {
   private title: string;
   private placeholder: string;
   private allowEmpty: boolean;
-  private onSubmit: (value: string) => void;
+  private onSubmit: (value: string) => void | Promise<void>;
 
   constructor(
     app: App,
     title: string,
     placeholder: string,
     allowEmpty: boolean,
-    onSubmit: (value: string) => void
+    onSubmit: (value: string) => void | Promise<void>
   ) {
     super(app);
     this.title = title;
@@ -140,19 +140,17 @@ class TextPromptModal extends Modal {
     contentEl.createEl("h3", { text: this.title });
     const input = contentEl.createEl("input", {
       type: "text",
+      cls: "slash-prompt-input",
       attr: { placeholder: this.placeholder },
     });
-    input.style.width = "100%";
-    input.style.padding = "6px 8px";
-    input.style.fontSize = "var(--font-ui-medium)";
-    setTimeout(() => input.focus(), 0);
+    window.setTimeout(() => input.focus(), 0);
     input.addEventListener("keydown", (ev) => {
       if (ev.key === "Enter") {
         ev.preventDefault();
         const value = input.value.trim();
         if (value || this.allowEmpty) {
           this.close();
-          this.onSubmit(value);
+          void this.onSubmit(value);
         }
       } else if (ev.key === "Escape") {
         this.close();
@@ -472,7 +470,7 @@ class SlashSuggest extends EditorSuggest<SlashCommand> {
     _file: TFile
   ): EditorSuggestTriggerInfo | null {
     const sub = editor.getLine(cursor.line).substring(0, cursor.ch);
-    const m = sub.match(/(?:^|\s)\/([a-zA-Z0-9#`>!\-]*)$/);
+    const m = sub.match(/(?:^|\s)\/([a-zA-Z0-9#`>!-]*)$/);
     if (!m) return null;
     const matchOffset = sub.length - m[0].length;
     const slashCh = m[0].startsWith("/") ? matchOffset : matchOffset + 1;
